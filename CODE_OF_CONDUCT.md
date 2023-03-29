@@ -1,8 +1,12 @@
-# The Vector Code of Conduct
+<h1 align="center">
+The Vector Code of Conduct
+<img src="docs/assets/vector-lang.png"/>
+</h1>
 
-## Contributor Covenant Code of Conduct
+# Contributor Covenant Code of Conduct
 
-### Our Pledge
+## Our Pledge
+
 In the interest of fostering an open and welcoming environment, we as
 contributors and maintainers pledge to making participation in our project and
 our community a harassment-free experience for everyone, regardless of age, body
