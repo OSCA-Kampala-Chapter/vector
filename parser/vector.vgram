@@ -1,0 +1,119 @@
+// Description of the vector programming language
+
+comment:
+	oneline_comment:
+		"//" WORDS NEW_LINE
+	multiline_comment:
+		"///" (WORDS NEW_LINE)+ "///"
+atom:
+	NAME			|
+	DECIMAL			|
+	HEXADECIMAL		|
+	NUMBER			|
+	STRING			|
+	"True"			|
+	"False"			|
+	"Null"			|
+	construction	|
+call_or_index:
+	call:
+		"(" [arguments] ")"	|
+	index:
+		"[" arguments "]"	|
+	NAME (call|index)+		|
+arguments:
+	([expression] ",")*		|
+	(NAME "=" expression)*	|
+dotted:
+	NAME ("." NAME)+	|
+construction:
+	array_construction:
+		"do" expression "foreach" "(" ((NAME [","])+|"*") "in" expression")"	|
+	map_construction:
+		"do" expression ":" expression "foreach" "(" ((NAME [","])+|"*") "in" expression")"	|
+	"[" [array_construction] "]"	|
+	"{" [map_construction] "}"		|
+unary:
+	symbols:
+		("+"|"-"|"~")						|
+	[symbols] (atom|call_or_index|dotted)	|
+binary:
+	unary (arithematic_op|aug_assign_op|comp_op) unary	|
+arithematic_op:
+	"+"|"-"|"*"|"/"	|
+aug_assign_op:
+	"+="|"-="|"*="|"/="	|
+comp_op:
+	"<"|">"|"<="|">="|"=="|"!="	|
+tertiary:
+	expression "if" expression "else" (tertiary|expression)	|
+assignment:
+	(type|"this" ".") NAME ["=" expression]	|
+expression:
+	unary			|
+	binary			|
+	construction	|
+	evaluation		|
+	expression		|
+type:
+	NAME ["("(NAME|type)+")"]	|
+evaluation:
+	(unary|binary) ("or"|"and"|"not") (unary|binary|evaluation)	|
+import_def:
+	["from" dotted] "import" dotted ["as" NAME]	|
+if_def:
+	"if" "(" expression ")" ":" statement ["elseif" "(" expression ")":statement]* ["else":statement]	|
+foreach_def:
+	"foreach" "(" expression "in" expression ")" ":" (statement|branch_def)+ ["else":statement]	|
+while_def:
+	"while" "(" expression ")" ":" (statement|branch_def)+ ["else":statement]	|
+repeat_until_def:
+	"repeat" ":" statement+ "until" "(" expression ")"	|
+label_def
+	NAME ":" statement	|
+goto_def:
+	"goto" NAME	|
+state_def:
+	"state" expression ":" case_def+	|
+case_def:
+	"case" (unary|"_") ":" statement	|
+on_def:
+	"on" expression ":" statement+	|
+return_def:
+	"return" expression	|
+branch_def:
+	"break"|"continue"|return_def	|
+do_on_def:
+	"do":(statement+) on_def+
+statement:
+	assignment			|
+	expression			|
+	if_def				|
+	foreach_def			|
+	while_def			|
+	repeat_until_def	|
+	label_def			|
+	goto_def			|
+	state_def			|
+func_def_only:
+	[modifiers] [type] "function" NAME "(" [parameters] ")" ";"	|
+func_def:
+	func_def_only ":" func_body	|
+method_def_only:
+	[modifiers] [type] "method" NAME "(" [parameters] ")" ";"	|
+method_def:
+	method_def_only ":" func_body	|
+modifiers:
+	"expose"|"coroutine"	|
+parameters:
+	(["-"] NAME ",")*					|
+	(["-"] NAME "=" ["..."|"{...}"])	|
+exposure:
+	"expose":assignment+	|
+interface_def:
+	"interface" ":" method_def_only+	|
+class_def:
+	["abstract"] "class" NAME ["inherits" dotted] ["implements" dotted] ":" method_def+	|
+func_body:
+	[comment]						|
+	(statement+ | return_def) ";"	|
