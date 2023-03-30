@@ -6,15 +6,17 @@ comment:
 	multiline_comment:
 		"///" (WORDS NEW_LINE)+ "///"
 atom:
-	NAME			|
-	DECIMAL			|
-	HEXADECIMAL		|
-	NUMBER			|
-	STRING			|
-	"True"			|
-	"False"			|
-	"Null"			|
-	construction	|
+	NAME					|
+	DECIMAL					|
+	HEXADECIMAL				|
+	NUMBER					|
+	STRING					|
+	"True"					|
+	"False"					|
+	"Null"					|
+	construction			|
+	"[" [atom ","]* "]"		|
+	"{" [atom ":" atom] "}"	|
 call_or_index:
 	call:
 		"(" [arguments] ")"	|
