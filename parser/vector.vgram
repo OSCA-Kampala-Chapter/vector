@@ -19,10 +19,10 @@ atom:
 	"{" [atom ":" atom] "}"	|
 call_or_index:
 	call:
-		"(" [arguments] ")"	|
+		"(" [arguments] ")"			|
 	index:
-		"[" arguments "]"	|
-	NAME (call|index)+		|
+		"[" arguments "]"			|
+	dotted ".".(call|index|dotted)+	|
 arguments:
 	([expression] ",")*		|
 	(NAME "=" expression)*	|
@@ -50,19 +50,19 @@ comp_op:
 tertiary:
 	expression "if" expression "else" (tertiary|expression)	|
 assignment:
-	(type|"this" ".") NAME ["=" expression]	|
+	[(type|"this")] dotted ["=" expression]	|
 expression:
-	unary			|
-	binary			|
-	construction	|
-	evaluation		|
-	expression		|
+	unary					|
+	binary					|
+	construction			|
+	evaluation				|
+	"(" expression ")"		|
 type:
 	NAME ["("(NAME|type)+")"]	|
 evaluation:
 	(unary|binary) ("or"|"and"|"not") (unary|binary|evaluation)	|
-import_def:
-	["from" dotted] "import" dotted ["as" NAME]	|
+as_def:
+	dotted "as" NAME
 if_def:
 	"if" "(" expression ")" ":" statement ["elseif" "(" expression ")":statement]* ["else":statement]	|
 foreach_def:
@@ -88,6 +88,7 @@ branch_def:
 do_on_def:
 	"do":(statement+) on_def+
 statement:
+	(
 	assignment			|
 	expression			|
 	if_def				|
@@ -97,6 +98,9 @@ statement:
 	label_def			|
 	goto_def			|
 	state_def			|
+	as_def				|
+	do_on_def			|
+	) ";"
 func_def_only:
 	[modifiers] [type] "function" NAME "(" [parameters] ")" ";"	|
 func_def:
@@ -119,3 +123,5 @@ class_def:
 func_body:
 	[comment]						|
 	(statement+ | return_def) ";"	|
+module_def:
+	(statement|exposure|func_def|class_def|interface_def)+
