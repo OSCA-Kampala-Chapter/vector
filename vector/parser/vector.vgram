@@ -17,6 +17,7 @@ atom:
 	construction			|
 	"[" [atom ","]* "]"		|
 	"{" [atom ":" atom] "}"	|
+	call_or_index			|
 call_or_index:
 	call:
 		"(" [arguments] ")"			|
