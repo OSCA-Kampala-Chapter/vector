@@ -2,46 +2,46 @@
 
 comment:
 	oneline_comment:
-		"//" WORDS NEW_LINE
+		"//" WORDS NEW_LINE              |
 	multiline_comment:
-		"///" (WORDS NEW_LINE)+ "///"
+		"///" (WORDS NEW_LINE)+ "///"    |
 atom:
-	NAME					|
-	DECIMAL					|
-	HEXADECIMAL				|
-	NUMBER					|
-	STRING					|
-	"True"					|
-	"False"					|
-	"Null"					|
-	construction			|
-	"[" [atom ","]* "]"		|
+	NAME                    |
+	DECIMAL                 |
+	HEXADECIMAL             |
+	NUMBER                  |
+	STRING                  |
+	"True"                  |
+	"False"                 |
+	"Null"                  |
+	construction            |
+	"[" [atom ","]* "]"     |
 	"{" [atom ":" atom] "}"	|
-	call_or_index			|
+	call_or_index           |
 call_or_index:
 	call:
-		"(" [arguments] ")"			|
+		"(" [arguments] ")"         |
 	index:
-		"[" arguments "]"			|
-	dotted ".".(call|index|dotted)+	|
+		"[" arguments "]"           |
+	dotted ".".(call|index|dotted)+ |
 arguments:
-	([expression] ",")*		|
-	(NAME "=" expression)*	|
+	([expression] ",")*     |
+	(NAME "=" expression)*  |
 dotted:
-	NAME ("." NAME)*	|
+	NAME ("." NAME)*    |
 construction:
 	array_construction:
 		"do" expression "foreach" "(" ((NAME [","])+|"*") "in" expression")"	|
 	map_construction:
 		"do" expression [":" expression] "foreach" "(" ((NAME [","])+|"*") "in" expression")"	|
-	"[" [array_construction] "]"	|
-	"{" [map_construction] "}"		|
+	"[" [array_construction] "]"    |
+	"{" [map_construction] "}"      |
 unary:
 	symbols:
-		("+"|"-"|"~")						|
-	[symbols] (atom|call_or_index|dotted)	|
+		("+"|"-"|"~")                       |
+	[symbols] (atom|call_or_index|dotted)   |
 binary:
-	unary (arithematic_op|aug_assign_op|comp_op) unary	|
+	unary (arithematic_op|aug_assign_op|comp_op) unary    |
 arithematic_op:
 	"+"|"-"|"*"|"/"	|
 aug_assign_op:
@@ -53,11 +53,11 @@ tertiary:
 assignment:
 	[modifiers][(type|"this")] dotted "=" expression	|
 expression:
-	unary					|
-	binary					|
-	construction			|
-	evaluation				|
-	"(" expression ")"		|
+	unary                   |
+	binary                  |
+	construction            |
+	evaluation              |
+	"(" expression ")"      |
 type:
 	NAME ["("(type [","type])")"]	|
 evaluation:
@@ -87,15 +87,15 @@ do_on_def:
 	"do":(statement+) on_def+
 statement:
 	(
-	assignment			|
-	expression			|
-	if_def				|
-	foreach_def			|
-	while_def			|
-	repeat_until_def	|
-	state_def			|
-	as_def				|
-	do_on_def			|
+	assignment          |
+	expression          |
+	if_def              |
+	foreach_def         |
+	while_def           |
+	repeat_until_def    |
+	state_def           |
+	as_def              |
+	do_on_def           |
 	) ";"
 func_def_only:
 	[modifiers] "function""(" type")" NAME "(" parameters ")" ";"	|
@@ -106,9 +106,9 @@ subfunc_def:
 modifiers:
 	"expose"|"coroutine"	|
 parameters:
-	(["-"] NAME ",")*					|
-	(["-"] NAME "=" ["..."|"{...}"])	|
-	"void"								|
+	(["-"] NAME ",")*                   |
+	(["-"] NAME "=" ["..."|"{...}"])    |
+	"void"                              |
 exposure:
 	"expose":assignment+	|
 interface_def:
@@ -117,7 +117,7 @@ class_def:
 	["abstract"] "class" NAME ["inherits" (","dotted)+]				\
 	["implements" (","dotted)+] ":" (assignment | function_def+)	|
 func_body:
-	[comment]						|
-	(statement+ | return_def) ";"	|
+	[comment]                       |
+	(statement+ | return_def) ";"   |
 module_def:
 	(statement|exposure|func_def|class_def|interface_def)+
