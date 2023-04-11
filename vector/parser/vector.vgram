@@ -17,6 +17,7 @@ atom:
 	construction			|
 	"[" [atom ","]* "]"		|
 	"{" [atom ":" atom] "}"	|
+	call_or_index			|
 call_or_index:
 	call:
 		"(" [arguments] ")"			|
@@ -27,12 +28,12 @@ arguments:
 	([expression] ",")*		|
 	(NAME "=" expression)*	|
 dotted:
-	NAME ("." NAME)+	|
+	NAME ("." NAME)*	|
 construction:
 	array_construction:
 		"do" expression "foreach" "(" ((NAME [","])+|"*") "in" expression")"	|
 	map_construction:
-		"do" expression ":" expression "foreach" "(" ((NAME [","])+|"*") "in" expression")"	|
+		"do" expression [":" expression] "foreach" "(" ((NAME [","])+|"*") "in" expression")"	|
 	"[" [array_construction] "]"	|
 	"{" [map_construction] "}"		|
 unary:
@@ -50,7 +51,7 @@ comp_op:
 tertiary:
 	expression "if" expression "else" (tertiary|expression)	|
 assignment:
-	[(type|"this")] dotted ["=" expression]	|
+	[modifiers][(type|"this")] dotted "=" expression	|
 expression:
 	unary					|
 	binary					|
@@ -58,23 +59,20 @@ expression:
 	evaluation				|
 	"(" expression ")"		|
 type:
-	NAME ["("(NAME|type)+")"]	|
+	NAME ["("(type [","type])")"]	|
 evaluation:
 	(unary|binary) ("or"|"and"|"not") (unary|binary|evaluation)	|
 as_def:
 	dotted "as" NAME
 if_def:
-	"if" "(" expression ")" ":" statement ["elseif" "(" expression ")":statement]* ["else":statement]	|
+	"if" "(" expression ")" "then" ":" statement 				\
+	["elseif" "(" expression ")":statement]* ["else":statement]	|
 foreach_def:
 	"foreach" "(" expression "in" expression ")" ":" (statement|branch_def)+ ["else":statement]	|
 while_def:
 	"while" "(" expression ")" ":" (statement|branch_def)+ ["else":statement]	|
 repeat_until_def:
 	"repeat" ":" statement+ "until" "(" expression ")"	|
-label_def
-	NAME ":" statement	|
-goto_def:
-	"goto" NAME	|
 state_def:
 	"state" expression ":" case_def+	|
 case_def:
@@ -95,31 +93,29 @@ statement:
 	foreach_def			|
 	while_def			|
 	repeat_until_def	|
-	label_def			|
-	goto_def			|
 	state_def			|
 	as_def				|
 	do_on_def			|
 	) ";"
 func_def_only:
-	[modifiers] [type] "function" NAME "(" [parameters] ")" ";"	|
+	[modifiers] "function""(" type")" NAME "(" parameters ")" ";"	|
 func_def:
-	func_def_only ":" func_body	|
-method_def_only:
-	[modifiers] [type] "method" NAME "(" [parameters] ")" ";"	|
-method_def:
-	method_def_only ":" func_body	|
+	func_def_only ":" (func_body|subfunc_def)
+subfunc_def:
+	"subfunction" "(" type ")" NAME "(" parameters ")" : func_body
 modifiers:
 	"expose"|"coroutine"	|
 parameters:
 	(["-"] NAME ",")*					|
 	(["-"] NAME "=" ["..."|"{...}"])	|
+	"void"								|
 exposure:
 	"expose":assignment+	|
 interface_def:
-	"interface" ":" method_def_only+	|
+	"interface" ":" function_def_only+	|
 class_def:
-	["abstract"] "class" NAME ["inherits" dotted] ["implements" dotted] ":" method_def+	|
+	["abstract"] "class" NAME ["inherits" (","dotted)+]				\
+	["implements" (","dotted)+] ":" (assignment | function_def+)	|
 func_body:
 	[comment]						|
 	(statement+ | return_def) ";"	|
